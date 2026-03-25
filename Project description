@@ -1,0 +1,173 @@
+Assignment: Adversarial Search - The Archer's Gambit
+
+1. Overview
+You will develop a Heuristic Minimax Agent with Alpha-Beta Pruning for a custom strategy game called Archer's Gambit.
+
+Compared with simpler games like Tic-Tac-Toe, Archer's Gambit has:
+- High branching factor (approximately 60 to 80)
+- A dynamic board that effectively shrinks as frozen cells increase
+
+2. Game Rules
+Board:
+- A 4 x 4 grid
+- Example state:
+
+    0 1 2 3
+  0 X W . .
+  1 . . . X
+  2 . X . .
+  3 . . . B
+
+Legend:
+- W = White Archer (MAX)
+- B = Black Archer (MIN)
+- X = Frozen cell
+- . = Empty cell
+
+Turn Structure (two phases):
+1. Move Phase:
+- Move exactly one square
+- Allowed directions: 8 neighbors (orthogonal + diagonal)
+- Destination must be an empty square
+
+2. Shoot Phase:
+- After moving, shoot an Ice Arrow in one of 8 directions
+- The arrow travels in a straight line
+- It freezes the furthest reachable empty square in that direction
+
+Arrow example:
+- If an archer is at [3,3] and shoots toward [0,0], the arrow freezes [0,0] if path is clear.
+- If [1,1] is blocked (by an archer or frozen cell), the arrow stops before that obstacle and freezes [2,2].
+
+Constraints:
+- Archers cannot move into frozen cells or occupied cells.
+- Arrows cannot pass through occupied or frozen cells.
+- You cannot freeze an empty cell behind an obstacle.
+
+Victory condition:
+- The last player who can make a legal move wins.
+- If you have no legal moves on your turn, you lose.
+
+3. Technical Tasks
+Your Python implementation must include the following:
+
+3.1 Two-Phase Action Logic
+Implement:
+- actions(state, turn)
+
+Requirements:
+- Generate all legal Move + Shoot combinations.
+- Each action must be a 4-tuple:
+  (move_to_x, move_to_y, shot_at_x, shot_at_y)
+- Respect all obstacles for both movement and arrow path.
+
+3.2 State Transition Model
+Implement:
+- result(state, action)
+
+Requirements:
+- Return a new board state.
+- Move the current player's archer.
+- Mark the arrow impact square as Frozen (value 3).
+
+3.3 Heuristic Minimax with Alpha-Beta Pruning
+Because full terminal search is too deep, implement a depth-limited search with:
+
+1. Depth cutoff:
+- Use cutoff_test
+- Recommended limit: depth 3 or 4 plies
+
+2. Alpha-Beta pruning:
+- Track alpha (MAX floor) and beta (MIN ceiling)
+- Prune branches that cannot affect the final decision
+
+3. Heuristic evaluation:
+- At cutoff depth, call evaluate(state)
+
+3.4 Heuristic Evaluation Design
+Your evaluate(state) should estimate who is winning using:
+
+1. Absolute mobility:
+- legal_moves(MAX) - legal_moves(MIN)
+
+2. Territorial control:
+- Use flood-fill or BFS
+- Estimate how many empty cells are closer/reachable by each archer
+
+3. Terminal values:
+- +10000 if opponent is trapped
+- -10000 if your agent is trapped
+
+4. Grading Rubric
+
+Criteria: Search Algorithm
+- 4 (Exemplary): Flawless Alpha-Beta pruning; recursive returns and alpha/beta updates are correct.
+- 3 (Proficient): Minimax is correct; Alpha-Beta exists with minor boundary errors.
+- 2 (Developing): Minimax works, but Alpha-Beta is absent or non-functional.
+- 1 (Beginning): Search logic is incomplete or generates illegal moves.
+- Score: /4
+
+Criteria: Heuristic Function
+- 4 (Exemplary): Strong mobility + territory logic and clear terminal handling.
+- 3 (Proficient): Basic mobility heuristic (MyMoves - OpponentMoves) that distinguishes better states.
+- 2 (Developing): Static heuristic (for example only frozen-cell counts), limited depth value.
+- 1 (Beginning): Random output or constant value.
+- Score: /4
+
+Criteria: Action Generation
+- 4 (Exemplary): Correct Move + Shoot logic; obstacles and board edges handled perfectly.
+- 3 (Proficient): Both phases implemented, but occasional illegal shots.
+- 2 (Developing): Only one phase is correct.
+- 1 (Beginning): Fails to generate legal actions for 4 x 4 board.
+- Score: /4
+
+Criteria: Code Efficiency
+- 4 (Exemplary): Optimized state handling; reaches depth 4 comfortably.
+- 3 (Proficient): Reaches depth 3 in reasonable time.
+- 2 (Developing): Too slow even at low depth (for example depth 2).
+- 1 (Beginning): Frequent crashes or excessive memory usage.
+- Score: /4
+
+Total Score: /16
+
+5. Self-Assessment and Reflection
+Important:
+- Include all answers below as block comments at the end of your single Python source file.
+- All technical and reflective content must be in that same .py file.
+
+5.1 Self-Assessment Table
+Use the rubric in Section 4 to score yourself:
+
+Aspect of Implementation | Self-Score (1-4)
+- Search Algorithm |
+- Heuristic Function |
+- Action Generation |
+- Code Efficiency |
+
+5.2 Reflection Questions
+Answer each briefly:
+
+Q1: Branching Factor Challenge
+- With branching factor much higher than Tic-Tac-Toe, how did you choose DEPTH_LIMIT?
+- What happened to execution time when depth increased by one level?
+
+Q2: Heuristic Philosophy
+- Why does your heuristic prioritize reducing opponent mobility over static position?
+
+Q3: Alpha-Beta Intuition
+- Describe one test case where pruning occurred.
+- Why was that branch safely ignored?
+
+Q4: Metacognitive Growth
+- What was the hardest logic hurdle (for example minimax recursion, two-phase action generation, or alpha/beta updates)?
+- How did you overcome it?
+
+6. Submission Instructions
+- Submit one .py file only.
+- Include self-assessment table and reflection comments at the end of the script.
+- Ensure print_state uses clear symbols for grading (for example W, B, X, .).
+
+Final grade weighting:
+- 50% teacher assessment
+- 40% self-assessment
+- 10% reflection quality (completeness and depth)
